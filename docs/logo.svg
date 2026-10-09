@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19" />
+      <stop offset="50%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#818cf8" />
+      <stop offset="100%" stop-color="#a855f7" />
+    </linearGradient>
+    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background rounded card -->
+  <rect width="512" height="512" rx="100" fill="url(#bgGrad)" />
+
+  <!-- Outer Neon Pulse Rings -->
+  <circle cx="256" cy="256" r="210" fill="none" stroke="url(#purpleGrad)" stroke-width="3" opacity="0.3" stroke-dasharray="12 12" />
+  <circle cx="256" cy="256" r="185" fill="none" stroke="url(#cyanGrad)" stroke-width="4" opacity="0.6" filter="url(#neonGlow)" />
+
+  <!-- Hexagonal Cyber Tunnel Outer -->
+  <polygon points="256,96 384,170 384,318 256,392 128,318 128,170" fill="none" stroke="url(#cyanGrad)" stroke-width="8" filter="url(#neonGlow)" />
+
+  <!-- Hexagonal Cyber Tunnel Mid -->
+  <polygon points="256,136 348,189 348,295 256,348 164,295 164,189" fill="none" stroke="url(#purpleGrad)" stroke-width="6" opacity="0.8" />
+
+  <!-- Hexagonal Cyber Tunnel Inner -->
+  <polygon points="256,176 312,208 312,272 256,304 200,272 200,208" fill="none" stroke="url(#cyanGrad)" stroke-width="4" opacity="0.9" />
+
+  <!-- Perspective Tunnel Vectors / Spokes -->
+  <line x1="256" y1="96" x2="256" y2="176" stroke="url(#cyanGrad)" stroke-width="4" />
+  <line x1="384" y1="170" x2="312" y2="208" stroke="url(#cyanGrad)" stroke-width="4" />
+  <line x1="384" y1="318" x2="312" y2="272" stroke="url(#purpleGrad)" stroke-width="4" />
+  <line x1="256" y1="392" x2="256" y2="304" stroke="url(#purpleGrad)" stroke-width="4" />
+  <line x1="128" y1="318" x2="200" y2="272" stroke="url(#purpleGrad)" stroke-width="4" />
+  <line x1="128" y1="170" x2="200" y2="208" stroke="url(#cyanGrad)" stroke-width="4" />
+
+  <!-- Glowing Center Core Node / Lock -->
+  <circle cx="256" cy="256" r="32" fill="#0f172a" stroke="url(#cyanGrad)" stroke-width="5" filter="url(#neonGlow)" />
+
+  <!-- Security Keyhole/Lock -->
+  <path d="M248 244 A 8 8 0 0 1 264 244 V 250 H 268 V 268 H 244 V 250 H 248 Z" fill="#38bdf8" />
+  <circle cx="256" cy="257" r="3" fill="#0f172a" />
+</svg>

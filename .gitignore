@@ -31,3 +31,19 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# Node / Frontend
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
+backend/dist/
+backend/internal/webui/dist/*
+!backend/internal/webui/dist/.gitkeep
+
+# Application runtime data
+data/
+data_test/
+*.db
+.secret.key
