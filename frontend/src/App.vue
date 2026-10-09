@@ -7,7 +7,7 @@
     <!-- 侧边栏 -->
     <el-aside width="230px" class="app-sidebar">
       <div class="logo-box">
-        <el-icon class="logo-icon"><Connection /></el-icon>
+        <img src="/logo.png" alt="SSHTunnelHub Logo" class="brand-logo-img" />
         <div class="logo-text">
           <span class="brand">SSHTunnelHub</span>
           <span class="subtitle">隧道管理中心</span>
@@ -160,9 +160,13 @@ body, html {
   gap: 12px;
 }
 
-.logo-icon {
-  font-size: 26px;
-  color: #3b82f6;
+.brand-logo-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
+  flex-shrink: 0;
 }
 
 .logo-text {
