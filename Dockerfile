@@ -2,26 +2,25 @@
 
 # ==========================================
 # Stage 1: Build Frontend (Vue 3 + Vite)
+# Use Debian-based node:20-slim for robust glibc native binary support (esbuild/rollup)
 # ==========================================
-FROM node:20-alpine AS frontend-builder
+FROM node:20-slim AS frontend-builder
 WORKDIR /app/frontend
 
-RUN npm install -g pnpm
+RUN npm install -g pnpm@9
 
 COPY frontend/package.json frontend/pnpm-lock.yaml* ./
-RUN pnpm install
+RUN pnpm install --no-frozen-lockfile
 
 COPY frontend/ ./
 RUN pnpm run build
 
 # ==========================================
 # Stage 2: Build Backend (Go 1.26 + Embed)
+# Use Debian-based golang:1.26-bookworm for reliable VCS & dependency resolution
 # ==========================================
-FROM golang:1.26-alpine AS backend-builder
+FROM golang:1.26-bookworm AS backend-builder
 WORKDIR /app/backend
-
-# Install git and certificates for dependency retrieval in Alpine
-RUN apk add --no-cache git ca-certificates
 
 ENV CGO_ENABLED=0 \
     GOOS=linux \
@@ -40,6 +39,7 @@ RUN go build -ldflags="-s -w" -o /app/sshtunnelhub ./cmd/server
 
 # ==========================================
 # Stage 3: Minimal Production Image
+# Lightweight Alpine runner with static Go binary
 # ==========================================
 FROM alpine:3.20 AS runner
 
