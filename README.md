@@ -86,10 +86,7 @@ docker compose logs -f
 ```yaml
 services:
   sshtunnelhub:
-    image: ghcr.io/${GITHUB_REPOSITORY:-owner/sshtunnelhub}:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/guiyuanyuanbao/sshtunnelhub:latest
     container_name: sshtunnelhub
     restart: unless-stopped
     ports:
@@ -119,7 +116,7 @@ docker run -d \
   -p 10000-10050:10000-10050 \
   -v $(pwd)/data:/data \
   -e TZ=Asia/Shanghai \
-  ghcr.io/owner/sshtunnelhub:latest
+  ghcr.io/guiyuanyuanbao/sshtunnelhub:latest
 ```
 
 ---

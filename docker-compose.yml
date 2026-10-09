@@ -1,15 +1,12 @@
 services:
   sshtunnelhub:
-    image: ghcr.io/${GITHUB_REPOSITORY:-owner/sshtunnelhub}:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/guiyuanyuanbao/sshtunnelhub:latest
     container_name: sshtunnelhub
     restart: unless-stopped
     ports:
-      # Web 管理后台端口
+      # Web 管理控制台端口
       - "9090:9090"
-      # 预留正向隧道转发常用端口范围 (按需调整或扩展)
+      # 预留正向隧道转发常用端口范围 (按需映射或根据业务增减)
       - "10000-10050:10000-10050"
     environment:
       - PORT=9090
@@ -18,5 +15,7 @@ services:
     volumes:
       # 数据持久化目录 (包含 SQLite 数据库及 AES-256 主密钥)
       - ./data:/data
-    # 提示: 如果在 Linux 宿主机上运行且需要监听任意主机端口，建议直接启用 host 网络模式:
-    # network_mode: "host"
+
+    # 【Linux 推荐部署模式 - Host 网络模式】
+    # 如果部署在 Linux 宿主机上，且希望隧道随意监听宿主机任意端口，可注释掉上面的 ports 并取消下面的注释：
+    # network_mode: host
