@@ -118,3 +118,14 @@ export interface LogEntry {
   tunnel_name?: string
   message: string
 }
+
+export interface AuthStatusVO {
+  initialized: boolean
+  from_env: boolean
+}
+
+export interface LoginResponse {
+  token: string
+  expires_in: number
+  message?: string
+}

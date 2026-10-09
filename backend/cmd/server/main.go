@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"sshtunnelhub/internal/auth"
 	"sshtunnelhub/internal/crypto"
 	"sshtunnelhub/internal/db"
 	"sshtunnelhub/internal/handler"
@@ -25,6 +26,7 @@ import (
 func main() {
 	port := flag.Int("port", 9090, "Port to listen on")
 	dataDir := flag.String("data-dir", "./data", "Directory to store database and secret keys")
+	authKey := flag.String("auth-key", "", "Secret key for accessing the hub (overrides stored key)")
 	flag.Parse()
 
 	if envPort := os.Getenv("PORT"); envPort != "" && *port == 9090 {
@@ -34,6 +36,9 @@ func main() {
 	}
 	if envDataDir := os.Getenv("DATA_DIR"); envDataDir != "" && *dataDir == "./data" {
 		*dataDir = envDataDir
+	}
+	if envAuth := os.Getenv("HUB_AUTH_KEY"); envAuth != "" && *authKey == "" {
+		*authKey = envAuth
 	}
 
 	log.Println("==================================================")
@@ -54,11 +59,21 @@ func main() {
 	// 3. Initialize Tunnel Manager
 	tunnelMgr := tunnel.NewTunnelManager()
 
-	// 4. Initialize Services
+	// 4. Initialize Auth Manager
+	authMgr := auth.NewAuthManager(*dataDir, *authKey, crypto.GetSecretKey())
+	if authMgr.IsFromEnv() {
+		log.Println("[Auth] Access key configured via environment (HUB_AUTH_KEY)")
+	} else if authMgr.IsInitialized() {
+		log.Println("[Auth] Access key loaded from persistent storage")
+	} else {
+		log.Println("[Auth] Access key not initialized. Initial setup wizard active on web UI.")
+	}
+
+	// 5. Initialize Services
 	hostSvc := service.NewHostService()
 	tunnelSvc := service.NewTunnelService(tunnelMgr)
 
-	// 5. Auto-start configured tunnels
+	// 6. Auto-start configured tunnels
 	var autoTunnels []model.Tunnel
 	if err := database.Where("auto_start = ?", true).Find(&autoTunnels).Error; err == nil && len(autoTunnels) > 0 {
 		var hosts []model.Host
@@ -71,13 +86,14 @@ func main() {
 		}
 	}
 
-	// 6. Initialize Handlers
+	// 7. Initialize Handlers
+	authHandler := handler.NewAuthHandler(authMgr)
 	hostHandler := handler.NewHostHandler(hostSvc)
 	tunnelHandler := handler.NewTunnelHandler(tunnelSvc)
 	logHandler := handler.NewLogHandler()
-	wsHub := handler.NewWSHub(tunnelSvc)
+	wsHub := handler.NewWSHub(tunnelSvc, authMgr)
 
-	// 7. Setup Web Router
+	// 8. Setup Web Router
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
 	router.Use(gin.Recovery())
@@ -103,8 +119,18 @@ func main() {
 		c.Next()
 	})
 
-	// API Routes
+	// Public Auth Routes
+	authGroup := router.Group("/api/auth")
+	{
+		authGroup.GET("/status", authHandler.Status)
+		authGroup.POST("/login", authHandler.Login)
+		authGroup.POST("/init", authHandler.Init)
+		authGroup.POST("/logout", authHandler.Logout)
+	}
+
+	// Protected API Routes
 	api := router.Group("/api")
+	api.Use(handler.AuthMiddleware(authMgr))
 	{
 		api.GET("/hosts", hostHandler.List)
 		api.GET("/hosts/:id", hostHandler.Get)

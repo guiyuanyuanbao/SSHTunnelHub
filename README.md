@@ -59,6 +59,12 @@
   - 支持 INFO / SUCCESS / WARN / ERROR 级别切换、特定隧道精准过滤、关键词模糊检索、实时自动滚动追踪及一键复制。
   - 每个隧道卡片底栏均配有一键直达日志入口。
 
+- 🔒 **全局访问秘钥认证与前端路由守卫 (Access Key & Route Guard)**
+  - **轻量单口令保护**：全局访问秘钥保护，单输入框极简解锁，阻断未经授权的主机凭据查阅。
+  - **环境变量最高权威**：支持通过环境变量 `HUB_AUTH_KEY` 一键预设；**若遗忘秘钥，直接修改环境变量并重启即可瞬间覆盖重置**，所有历史 Token 自动熔断失效。
+  - **首次启动向导自愈**：未设环境变量时，首次打开 Web 端自动弹出初始化向导，加盐哈希安全持久化。
+  - **立体拦截体系**：Vue Router 路由守卫拦截全站未授权访问，Gin API 中间件与 WebSocket 握手强制校验 Token，顶栏支持一键锁定控制台。
+
 - 🐳 **Docker 原生 & 自动化发布**
   - 预置多阶段构建 `Dockerfile` 与 `docker-compose.yml`，镜像体积精炼（< 40MB）。
   - 内置 GitHub Actions CI，代码推送或打标签时自动编译发布多架构镜像（`linux/amd64`, `linux/arm64`）至 GitHub Container Registry (GHCR)。
@@ -96,6 +102,8 @@ services:
       - PORT=9090
       - DATA_DIR=/data
       - TZ=Asia/Shanghai
+      # 【全局访问秘钥】可选环境变量: 设置后强制启用口令认证保护; 若遗忘可在此直接修改并重启覆盖
+      # - HUB_AUTH_KEY=YourStrongPassword2026!
     volumes:
       - ./data:/data              # 数据持久化目录 (SQLite 数据库与加密密钥)
 ```
@@ -116,6 +124,7 @@ docker run -d \
   -p 10000-10050:10000-10050 \
   -v $(pwd)/data:/data \
   -e TZ=Asia/Shanghai \
+  -e HUB_AUTH_KEY=YourStrongPassword2026! \
   ghcr.io/guiyuanyuanbao/sshtunnelhub:latest
 ```
 
@@ -142,6 +151,7 @@ SSHTunnelHub 支持编译为单一无外部依赖的二进制可执行程序。
 **常用启动命令行参数：**
 - `-port 9090`：指定 Web 服务监听端口（默认 `9090`，也可通过环境变量 `PORT=9090` 指定）。
 - `-data-dir ./data`：指定数据库与主密钥存储目录（默认 `./data`，也可通过环境变量 `DATA_DIR=/data` 指定）。
+- `-auth-key <secret>`：指定访问秘钥（默认从 `./data/.auth.hash` 读取或由环境变量 `HUB_AUTH_KEY` 指定，若未配置则在首次打开网页时触发向导）。
 
 ---
 

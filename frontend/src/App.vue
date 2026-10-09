@@ -1,5 +1,9 @@
 <template>
-  <el-container class="app-container">
+  <!-- 登录锁屏页: 独立全屏视图 -->
+  <router-view v-if="$route.path === '/login'" />
+
+  <!-- 控制台主界面 -->
+  <el-container v-else class="app-container">
     <!-- 侧边栏 -->
     <el-aside width="230px" class="app-sidebar">
       <div class="logo-box">
@@ -63,6 +67,17 @@
           <div class="quick-stat">
             活动隧道: <strong>{{ store.stats.running_tunnels }}</strong> / {{ store.stats.total_tunnels }}
           </div>
+          <el-divider direction="vertical" />
+          <el-tooltip content="锁定控制台并退出会话" placement="bottom">
+            <el-button
+              type="danger"
+              size="small"
+              plain
+              circle
+              :icon="Lock"
+              @click="handleLogout"
+            />
+          </el-tooltip>
         </div>
       </el-header>
 
@@ -76,14 +91,36 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { Odometer, Platform, Connection, Tickets } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
+import { Odometer, Platform, Connection, Tickets, Lock } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { useTunnelStore } from './store/useTunnelStore'
+import { useAuthStore } from './store/useAuthStore'
 
+const router = useRouter()
 const store = useTunnelStore()
+const authStore = useAuthStore()
 
 onMounted(() => {
-  store.initWebSocket()
+  if (authStore.isAuthenticated) {
+    store.initWebSocket()
+  }
 })
+
+async function handleLogout() {
+  try {
+    await ElMessageBox.confirm('确定要锁定控制台并退出当前访问会话吗？', '锁定提示', {
+      confirmButtonText: '确定锁定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    })
+    authStore.logout()
+    ElMessage.info('控制台已锁定')
+    router.replace('/login')
+  } catch {
+    // canceled
+  }
+}
 </script>
 
 <style>

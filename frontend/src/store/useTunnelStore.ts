@@ -65,7 +65,8 @@ export const useTunnelStore = defineStore('tunnel', () => {
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
     const host = window.location.host
-    const wsUrl = `${protocol}//${host}/ws`
+    const token = localStorage.getItem('ssh_hub_token')
+    const wsUrl = token ? `${protocol}//${host}/ws?token=${encodeURIComponent(token)}` : `${protocol}//${host}/ws`
 
     try {
       ws = new WebSocket(wsUrl)

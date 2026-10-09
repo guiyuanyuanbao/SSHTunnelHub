@@ -3,11 +3,13 @@ package handler
 import (
 	"log"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"sshtunnelhub/internal/auth"
 	"sshtunnelhub/internal/logger"
 	"sshtunnelhub/internal/service"
 )
@@ -20,13 +22,15 @@ var upgrader = websocket.Upgrader{
 
 type WSHub struct {
 	tunnelSvc *service.TunnelService
+	authMgr   *auth.AuthManager
 	clients   map[*websocket.Conn]bool
 	mu        sync.Mutex
 }
 
-func NewWSHub(tunnelSvc *service.TunnelService) *WSHub {
+func NewWSHub(tunnelSvc *service.TunnelService, authMgr *auth.AuthManager) *WSHub {
 	hub := &WSHub{
 		tunnelSvc: tunnelSvc,
+		authMgr:   authMgr,
 		clients:   make(map[*websocket.Conn]bool),
 	}
 
@@ -55,6 +59,21 @@ func (h *WSHub) BroadcastLog(entry logger.LogEntry) {
 }
 
 func (h *WSHub) HandleWS(c *gin.Context) {
+	// Authenticate WebSocket handshake if auth is initialized
+	if h.authMgr != nil && h.authMgr.IsInitialized() {
+		token := c.Query("token")
+		if token == "" {
+			authHeader := c.GetHeader("Authorization")
+			if strings.HasPrefix(authHeader, "Bearer ") {
+				token = strings.TrimPrefix(authHeader, "Bearer ")
+			}
+		}
+		if token == "" || !h.authMgr.ValidateToken(token) {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+	}
+
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Printf("[WS] Upgrade failed: %v", err)

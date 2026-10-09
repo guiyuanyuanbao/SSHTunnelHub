@@ -120,3 +120,13 @@ func Decrypt(cipherTextBase64 string) (string, error) {
 
 	return string(plainText), nil
 }
+
+// GetSecretKey returns a copy of the initialized 32-byte master secret key.
+func GetSecretKey() []byte {
+	if len(secretKey) == 0 {
+		return nil
+	}
+	cp := make([]byte, len(secretKey))
+	copy(cp, secretKey)
+	return cp
+}

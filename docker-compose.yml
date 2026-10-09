@@ -12,6 +12,8 @@ services:
       - PORT=9090
       - DATA_DIR=/data
       - TZ=Asia/Shanghai
+      # 【全局访问秘钥】可选环境变量: 设置后强制启用口令认证保护; 若遗忘可在此直接修改并重启覆盖
+      # - HUB_AUTH_KEY=YourStrongPassword2026!
     volumes:
       # 数据持久化目录 (包含 SQLite 数据库及 AES-256 主密钥)
       - ./data:/data
