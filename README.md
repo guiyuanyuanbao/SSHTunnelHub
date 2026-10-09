@@ -6,7 +6,7 @@
 
   **现代化、高可用、工业级 SSH 隧道与端口转发管理中心**
 
-  [![Go Version](https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat&logo=go)](https://golang.org)
+  [![Go Version](https://img.shields.io/badge/Go-1.26+-00ADD8?style=flat&logo=go)](https://golang.org)
   [![Vue Version](https://img.shields.io/badge/Vue-3.4+-4FC08D?style=flat&logo=vuedotjs)](https://vuejs.org)
   [![Element Plus](https://img.shields.io/badge/Element%20Plus-2.8+-409EFF?style=flat&logo=element)](https://element-plus.org)
   [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat&logo=docker)](https://www.docker.com/)
@@ -191,7 +191,7 @@ SSHTunnelHub 支持编译为单一无外部依赖的二进制可执行程序。
 ## 🛠️ 本地开发与全量构建
 
 ### 前置要求
-- Go 1.22+
+- Go 1.26+
 - Node.js 20+ & pnpm 9+
 
 ### 一键构建与打包 (Windows PowerShell)

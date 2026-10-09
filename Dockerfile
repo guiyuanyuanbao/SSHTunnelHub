@@ -15,13 +15,17 @@ COPY frontend/ ./
 RUN pnpm run build
 
 # ==========================================
-# Stage 2: Build Backend (Go 1.22 + Embed)
+# Stage 2: Build Backend (Go 1.26 + Embed)
 # ==========================================
-FROM golang:1.22-alpine AS backend-builder
+FROM golang:1.26-alpine AS backend-builder
 WORKDIR /app/backend
 
+# Install git and certificates for dependency retrieval in Alpine
+RUN apk add --no-cache git ca-certificates
+
 ENV CGO_ENABLED=0 \
-    GOOS=linux
+    GOOS=linux \
+    GOPROXY=https://proxy.golang.org,direct
 
 COPY backend/go.mod backend/go.sum ./
 RUN go mod download
